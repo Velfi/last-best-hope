@@ -1,0 +1,5 @@
+brew "llvm@22"
+brew "harfbuzz"
+brew "freetype"
+brew "pkg-config"
+brew "odinfmt"

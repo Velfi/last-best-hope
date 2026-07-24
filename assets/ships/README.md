@@ -35,7 +35,7 @@ alpha-matted review asset. Both use a 6×4 grid, ordered left-to-right:
 4. Battleship, carrier, dreadnought, utility hull, transport hull, habitat hull
 
 The source was generated with OpenAI's built-in image-generation tool on July
-21, 2026. The prompt followed `docs/art-direction.md`: orthographic top-down
+21, 2026. The prompt followed `docs/project/art-direction.md`: orthographic top-down
 ships, monochrome engraved linework, readable axial silhouettes, functional
 modules, sparse highlights, no labels, and a uniform `#ff00ff` background. The
 background was removed locally with the Codex image-generation skill's

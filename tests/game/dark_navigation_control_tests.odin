@@ -181,9 +181,11 @@ coherence_patch_is_unavailable_when_the_held_course_exceeds_its_buffer :: proc(t
 		1906,
 	); defer campaign_destroy(&c); ok, _ := begin_authorized_test_passage(&c, default_passage_contract(), []int{0}, &c.passage); testing.expect(t, ok); p := &c.passage
 	course := Dark_Course {
-		waypoint_count = 2,
+		waypoint_count = 8,
 	}; course.waypoints[0].position =
-		p.dark_navigation.position; course.waypoints[1].position = dark_vec4_add(course.waypoints[0].position, {40, 0, 0, 8}); _, ok = plot_passage_course(&c, p, course); testing.expect(t, ok); p.phase = .Awaiting_Leg; p.pause_reason = .Coherence_Limit; p.dark_navigation.autopilot_active = false; p.coherence_exposure = passage_coherence_limit(p) + .1
+		p.dark_navigation.position
+	for waypoint in 1 ..< course.waypoint_count do course.waypoints[waypoint].position = waypoint % 2 == 0 ? course.waypoints[0].position : dark_vec4_add(course.waypoints[0].position, {4, 0, 0, 0})
+	_, ok = plot_passage_course(&c, p, course); testing.expect(t, ok); p.phase = .Awaiting_Leg; p.pause_reason = .Coherence_Limit; p.dark_navigation.autopilot_active = false; p.coherence_exposure = passage_coherence_limit(p) + .1
 	preview := passage_coherence_recovery_preview(
 		&c,
 		p,

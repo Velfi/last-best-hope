@@ -305,10 +305,12 @@ draw_tooltip :: proc() {
 		)
 		legend_labels := [5]string{"PRODUCED", "IMPORTED", "USED", "EXPORTED", "LOST"}
 		legend_colors := [5]rl.Color{UX.good, UX.info, UX.warn, UX.dim, UX.bad}
-		legend_x := graph_rect.x
 		for legend, i in legend_labels {
-			draw_text(legend, legend_x, y + 154, TYPE_FINE, legend_colors[i])
-			legend_x += measure_text(legend, TYPE_FINE).x + 8
+			// Each label shares its bar's center; a packed legend drifts labels
+			// left while the graph distributes bars across its full width.
+			label_width := measure_text(legend, TYPE_FINE).x
+			bar_center := graph_rect.x + graph_rect.width * (f32(i) + .5) / f32(len(legend_labels))
+			draw_text(legend, bar_center - label_width / 2, y + 154, TYPE_FINE, legend_colors[i])
 		}
 	}
 }

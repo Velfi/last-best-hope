@@ -62,6 +62,19 @@ enter_passage_dark :: proc(c: ^Campaign, p: ^Passage, door_id: u64 = 0) -> (bool
 	return false, "No accessible mapped Dark correspondence reaches this galaxy neighborhood."
 }
 
+// Crossing resolves the endpoint and removes this door from the unknown search.
+// Re-enter through the newly mapped correspondence before selecting the next leg.
+continue_systematic_dark_search :: proc(c: ^Campaign, p: ^Passage) -> bool {
+	if !p.systematic_search_active do return false
+	p.systematic_search_active = false
+	crossed, _ := cross_passage_door(c, p)
+	if !crossed || p.contract.objective_met do return false
+	entered, _ := enter_passage_dark(c, p, p.pending_door_id)
+	if !entered do return false
+	continued, _ := order_systematic_dark_search(c, p)
+	return continued
+}
+
 dark_expedition_ship_offset :: proc(id: Ship_ID) -> Dark_Vec4 {
 	state := u64(id) ~ 0x736869702d3464
 	return {
@@ -266,8 +279,7 @@ advance_passage_dark_fixed :: proc(c: ^Campaign, p: ^Passage) {
 		p.phase = .Awaiting_Leg
 		p.pause_reason = .Course_Arrival
 		if p.systematic_search_active {
-			p.systematic_search_active = false
-			continued, _ := order_systematic_dark_search(c, p)
+			continued := continue_systematic_dark_search(c, p)
 			if !continued && auto_explore_return_reserve_required(c, p) do p.pause_reason = .Propellant_Reserve
 		}
 	}

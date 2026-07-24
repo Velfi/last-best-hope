@@ -64,18 +64,19 @@ or long-horizon behavior.
   `tests/game/game_package_aliases.odin` if a migrated test needs another
   exported game declaration.
 - Keep `zelda-engine` product-neutral.
-- Read [writing guidelines](docs/writing-guidelines.md) before changing
-  player-facing text, and [art direction](docs/art-direction.md) before
+- Read [writing guidelines](docs/project/writing-guidelines.md) before changing
+  player-facing text, and [art direction](docs/project/art-direction.md) before
   changing visual assets or UI treatments.
 
 ## Further reading
 
-- [Documentation index](docs/README.md) — product and engineering contracts.
-- [Diaspora Fleet](docs/diaspora-fleet.md) — campaign loop and persistent
-  civilization.
-- [Passage expeditions](docs/passage-expeditions.md) — Outer Dark operations
-  and their persistence rules.
-- [Close engagement](docs/close-engagement.md) — fleet-operation controls and
-  implementation contract.
-- [Campaign validation](docs/campaign-validation.md) — balance and release
-  evidence.
+- [Documentation index](docs/README.md) — current contracts, setting, plans,
+  and evidence.
+- [Diaspora Fleet](docs/planning/diaspora-fleet.md) — planned campaign loop and
+  persistent-civilization target.
+- [Passage expeditions](docs/project/passage-expeditions.md) — current Outer
+  Dark operations and persistence rules.
+- [Close engagement](docs/project/close-engagement.md) — current fleet-operation
+  controls and implementation contract.
+- [Campaign validation](docs/evidence/campaign-validation.md) — dated balance
+  and release evidence.

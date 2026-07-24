@@ -1,7 +1,7 @@
 # Last Best Hope contributor notes
 
-Read `docs/writing-guidelines.md` before authoring or reviewing player-facing text.
-Read `docs/art-direction.md` before creating or reviewing visual assets, shaders,
+Read `docs/project/writing-guidelines.md` before authoring or reviewing player-facing text.
+Read `docs/project/art-direction.md` before creating or reviewing visual assets, shaders,
 UI treatments, or image-generation prompts.
 
 - Keep simulation rules deterministic for a supplied seed.

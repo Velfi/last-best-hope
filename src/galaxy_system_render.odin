@@ -203,9 +203,18 @@ draw_selected_solar_system :: proc(s: ^Ux_State, sample_index: int) {
 		}; s.modal = .Body_Detail}
 }
 
-draw_celestial_stat :: proc(x, y: f32, label, value: string, color := UX.text) {
+// A metric's definition belongs at its point of use. The dossier remains a
+// compact survey plate while players who hover an unfamiliar term get its
+// measurement basis without leaving the system record.
+draw_celestial_stat :: proc(x, y: f32, label, value: string, color := UX.text, description := "") {
 	draw_text(label, x, y, TYPE_FINE, UX.dim)
 	draw_text(value, x, y + 17, TYPE_SUBHEADING_COMPACT, color)
+	if len(description) > 0 && rl.CheckCollisionPointRec(ux_mouse, R(x, y - 3, 132, 43)) do ux_tooltip = {
+		visible = true,
+		anchor  = R(x, y - 3, 132, 43),
+		title   = label,
+		body    = description,
+	}
 }
 
 system_planet_kind_label :: proc(kind: game.System_Planet_Kind) -> string {

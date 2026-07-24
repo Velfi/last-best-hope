@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Check and fast tests
+    runs-on: macos-latest
+
+    env:
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+      ZELDA_ENGINE_REPOSITORY: ${{ vars.ZELDA_ENGINE_REPOSITORY || 'Velfi/zelda-engine' }}
+      ZELDA_ENGINE_REF: ${{ vars.ZELDA_ENGINE_REF || 'main' }}
+      ZELDA_ENGINE_ROOT: ${{ github.workspace }}/zelda-engine
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check out Zelda Engine
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.ZELDA_ENGINE_REPOSITORY }}
+          ref: ${{ env.ZELDA_ENGINE_REF }}
+          path: zelda-engine
+          submodules: recursive
+          token: ${{ secrets.ZELDA_ENGINE_TOKEN || github.token }}
+
+      - name: Cache Homebrew downloads
+        id: brew-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/Library/Caches/Homebrew
+          key: ${{ runner.os }}-${{ runner.arch }}-homebrew-v1-${{ hashFiles('.github/Brewfile') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-homebrew-v1-
+
+      - name: Install macOS build dependencies
+        shell: bash
+        run: brew bundle install --file=.github/Brewfile --no-upgrade
+
+      - name: Save Homebrew download cache
+        if: steps.brew-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/Library/Caches/Homebrew
+          key: ${{ steps.brew-cache.outputs.cache-primary-key }}
+
+      - name: Restore pinned toolchain
+        id: toolchain-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .tools
+          key: ${{ runner.os }}-${{ runner.arch }}-toolchain-v1-${{ hashFiles('toolchain.mk', 'tools/bootstrap-macos.sh') }}
+
+      - name: Install pinned Odin and Slang
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: ./tools/bootstrap-macos.sh
+
+      - name: Verify cached toolchain
+        if: steps.toolchain-cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: make doctor
+
+      - name: Save pinned toolchain
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .tools
+          key: ${{ steps.toolchain-cache.outputs.cache-primary-key }}
+
+      - name: Fast tests
+        shell: bash
+        run: make test-fast

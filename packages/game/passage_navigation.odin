@@ -602,8 +602,39 @@ passage_course_to_unknown_door :: proc(
 ) -> (
 	Dark_Course,
 	bool,
-) {i := dark_nearest_unknown_door(&c.outer_dark.continuum, p.dark_navigation.position); if i < 0 do return {}, false
-	return passage_course_to_door(c, p, c.outer_dark.continuum.doors[i].id, depth)
+) {
+	if !p.active || p.domain != .Dark do return {}, false
+	d := &c.outer_dark.continuum
+	// Load the same local horizon that the ordinary nearest-door query uses.
+	// Auto Explore then evaluates every detected unknown in that horizon instead
+	// of blindly repeating the closest metric target.
+	_ = dark_nearest_unknown_door(d, p.dark_navigation.position)
+	best := Dark_Course{}
+	best_score := f64(1e30)
+	for &door in d.doors[:d.door_count] {
+		if door.endpoint_known || dark_door_detection_confidence(d, p.dark_navigation.position, &door) <= .05 do continue
+		candidate, found := passage_course_to_door(c, p, door.id, depth)
+		if !found || !passage_course_within_depth_envelope(c, p, &candidate) do continue
+		// Automatic routing never spends an uncommitted emergency descent. It can
+		// stop at that decision boundary, but should prefer another safe opening.
+		if passage_course_requires_emergency(c, p, &candidate) do continue
+		forecast := passage_dark_course_forecast(c, p, &candidate)
+		if forecast.distance > passage_exploration_propellant_remaining(c, p) + 1e-6 do continue
+		score := forecast.distance
+		switch p.strategy.course {
+		case .Best_Mapped:
+			score += (1 - forecast.topology_confidence) * 12
+		case .Lowest_Coherence:
+			score = forecast.coherence_cost
+		case .Shortest_Metric:
+		}
+		if p.strategy.ecology == .Avoidant do score += forecast.ecological_interception * 8
+		if score < best_score {
+			best = candidate
+			best_score = score
+		}
+	}
+	return best, best.waypoint_count > 0
 }
 
 passage_propellant_capacity :: proc(p: ^Passage) -> f64 {

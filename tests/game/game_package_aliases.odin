@@ -1564,6 +1564,7 @@ Passage_Promise_Status :: game.Passage_Promise_Status
 passage_record_discovery :: game.passage_record_discovery
 passage_remaining_course :: game.passage_remaining_course
 passage_return_reserve :: game.passage_return_reserve
+continue_systematic_dark_search :: game.continue_systematic_dark_search
 passage_shear_evasion_learners :: game.passage_shear_evasion_learners
 Passage_Ship_Trait :: game.Passage_Ship_Trait
 place_institution :: game.place_institution

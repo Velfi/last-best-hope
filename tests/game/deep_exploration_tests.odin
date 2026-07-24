@@ -40,6 +40,8 @@ deep_exploration_auto_explore_starts_with_a_safe_first_leg :: proc(t: ^testing.T
 	testing.expect(t, ok)
 	testing.expect(t, c.passage.systematic_search_active)
 	testing.expect_value(t, c.passage.phase, Dark_Expedition_Phase.Underway)
+	testing.expect(t, !passage_course_requires_emergency(&c, &c.passage, &c.passage.dark_navigation.course))
+	testing.expect(t, passage_course_within_depth_envelope(&c, &c.passage, &c.passage.dark_navigation.course))
 }
 
 deep_exploration_cross_unknown_for_test :: proc(c: ^Campaign) -> bool {
@@ -48,6 +50,25 @@ deep_exploration_cross_unknown_for_test :: proc(c: ^Campaign) -> bool {
 	c.passage.dark_navigation.position = c.outer_dark.continuum.doors[i].position
 	ok, _ := cross_passage_door(c, &c.passage)
 	return ok
+}
+
+@(test)
+auto_explore_crosses_an_unknown_correspondence_before_retargeting :: proc(t: ^testing.T) {
+	c: Campaign
+	campaign_init(&c, 2200)
+	defer campaign_destroy(&c)
+	testing.expect(t, deep_exploration_begin_for_test(&c, .Ecological_Survey))
+	first := dark_nearest_unknown_door(&c.outer_dark.continuum, c.passage.dark_navigation.position)
+	testing.expect(t, first >= 0)
+	first_id := c.outer_dark.continuum.doors[first].id
+	c.passage.dark_navigation.position = c.outer_dark.continuum.doors[first].position
+	c.passage.systematic_search_active = true
+
+	_ = continue_systematic_dark_search(&c, &c.passage)
+
+	testing.expect(t, dark_fleet_door_known(&c, first_id))
+	testing.expect_value(t, c.passage.pending_door_id, first_id)
+	testing.expect_value(t, c.passage.domain, Expedition_Domain.Dark)
 }
 
 @(test)

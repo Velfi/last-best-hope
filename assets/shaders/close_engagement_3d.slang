@@ -921,12 +921,6 @@ float4 background_fragment(BackgroundOutput input) : SV_Target {
         luminance*=lerp(1.0,.58,corner);
         float plate=step(.9987,hash21(floor(pixel*.5)+seed*.071));
         luminance+=plate*.035;
-        float crossing_exposure=dark.presentation.w;
-        if (crossing_exposure>0.0) {
-            float sweep=1.0-smoothstep(.004,.026,
-                abs(input.uv.x-(dark.presentation.y>.5?.5:frac(dark.presentation.x*.11))));
-            luminance+=sweep*crossing_exposure*.018;
-        }
     }
 
     return float4(float3(luminance * .92, luminance * .94, luminance), 1);

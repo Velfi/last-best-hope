@@ -213,6 +213,9 @@ dark_draw_arrival_tray :: proc(s: ^Ux_State) -> bool {
 		"OPENING %04d IN RANGE",
 		door.id % 10000,
 	); draw_text("Arrival complete. The fleet is holding position.", 20, 652, TYPE_FINE, UX.text)
+	if button({588, 632, 210, 42}, "AUTO EXPLORE", true, true) {
+		_, s.status = game.order_systematic_dark_search(s.campaign, p)
+	}
 	if button({816, 632, 210, 42}, "CHANGE COURSE", true, true) {
 		s.dark_selection_kind = .None
 		s.dark_selection_id = 0

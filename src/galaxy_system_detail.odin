@@ -163,6 +163,7 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				"REMNANT MASS",
 				fmt.tprintf("%.3f M-SOLAR", mass),
 				UX.text,
+				"Mass of the black-hole remnant, compared with the Sun.",
 			)
 			draw_celestial_stat(
 				924,
@@ -170,6 +171,7 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				"EVENT HORIZON",
 				fmt.tprintf("%.2f KM", game.black_hole_schwarzschild_radius_km(mass)),
 				UX.text,
+				"Radius beyond which light cannot escape, calculated for a non-spinning black hole.",
 			)
 			draw_celestial_stat(
 				780,
@@ -177,6 +179,7 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				"PHOTON SPHERE",
 				fmt.tprintf("%.2f KM", game.black_hole_photon_sphere_radius_km(mass)),
 				UX.text,
+				"Radius of unstable circular paths for light around the remnant.",
 			)
 			draw_celestial_stat(
 				924,
@@ -184,6 +187,7 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				"ISCO / ZERO SPIN",
 				fmt.tprintf("%.2f KM", game.black_hole_isco_radius_km(mass)),
 				UX.text,
+				"Innermost stable circular orbit, assuming the black hole has no spin.",
 			)
 			draw_celestial_stat(
 				780,
@@ -191,6 +195,7 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				"SYSTEM AGE",
 				fmt.tprintf("%.2f GYR", star.profile.age_billion_years),
 				UX.text,
+				"Time since the system formed. GYR means billion years.",
 			)
 			draw_celestial_stat(
 				924,
@@ -198,14 +203,16 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				"PROGENITOR MASS",
 				fmt.tprintf("%.2f M-SOLAR", star.initial_mass_solar),
 				UX.text,
+				"Mass of the star that collapsed to form this remnant, compared with the Sun.",
 			)
-			draw_celestial_stat(780, 396, "BOUND STATE", star.bound ? "BOUND" : "UNBOUND", UX.text)
+			draw_celestial_stat(780, 396, "BOUND STATE", star.bound ? "BOUND" : "UNBOUND", UX.text, "Whether this remnant remains gravitationally bound to the system.")
 			draw_celestial_stat(
 				924,
 				396,
 				"ACCRETION STATE",
 				black_hole_accretion_label(accretion.kind),
 				UX.text,
+				"Whether the remnant is presently receiving matter from a companion or surrounding material.",
 			)
 			draw_celestial_stat(
 				780,
@@ -213,6 +220,7 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				"EDDINGTON FRACTION",
 				accretion.kind == .Dormant ? "< 1e-7" : fmt.tprintf("%.2e", accretion.eddington_fraction),
 				UX.text,
+				"Brightness from infalling matter as a share of the theoretical radiation-pressure limit.",
 			)
 			draw_celestial_stat(
 				924,
@@ -224,6 +232,7 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 					black_hole_position_angle_degrees(accretion),
 				),
 				UX.text,
+				"Viewing tilt and sky orientation used for this reconstruction, in degrees.",
 			)
 		} else {
 			draw_celestial_stat(
@@ -232,36 +241,47 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				"EFFECTIVE TEMPERATURE",
 				fmt.tprintf("%.0f K", star.effective_temperature_k),
 				UX.warn,
+				"The temperature of a blackbody that would emit the same total light. K means kelvin.",
 			)
 			draw_celestial_stat(
 				924,
 				180,
 				"STELLAR MASS",
 				fmt.tprintf("%.3f M-SOLAR", star.profile.mass_solar),
+				UX.text,
+				"Mass compared with the Sun. It governs the star's gravity and evolution.",
 			)
 			draw_celestial_stat(
 				780,
 				252,
 				"STELLAR RADIUS",
 				fmt.tprintf("%.3f R-SUN", star.profile.radius_solar),
+				UX.text,
+				"Radius compared with the Sun's radius.",
 			)
 			draw_celestial_stat(
 				924,
 				252,
 				"LUMINOSITY",
 				fmt.tprintf("%.3f L-SUN", star.profile.luminosity_solar),
+				UX.text,
+				"Total energy emitted compared with the Sun. It sets the light and heat reaching each orbit.",
 			)
 			draw_celestial_stat(
 				780,
 				324,
 				"CURRENT AGE",
 				fmt.tprintf("%.2f GYR", star.profile.age_billion_years),
+				UX.text,
+				"Time since the star formed. GYR means billion years.",
 			)
 			draw_celestial_stat(
 				924,
 				324,
 				"MAIN-SEQUENCE LIFE",
 				fmt.tprintf("%.2f GYR", star.main_sequence_lifetime_billion_years),
+				UX.text,
+				"Expected duration of the star's stable hydrogen-burning phase.",
 			)
 			draw_celestial_stat(
 				780,
@@ -275,6 +295,8 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				396,
 				"FROST LINE",
 				fmt.tprintf("%.2f AU", system.frost_line_au),
+				UX.text,
+				"Distance where water and other volatiles can freeze into ice. One AU is the Earth–Sun distance.",
 			)
 			draw_celestial_stat(
 				780,
@@ -282,12 +304,15 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				"EVOLUTIONARY PHASE",
 				fmt.tprintf("%v", star.phase),
 				UX.info,
+				"The current stage of the star's life cycle.",
 			)
 			draw_celestial_stat(
 				924,
 				468,
 				"INITIAL MASS",
 				fmt.tprintf("%.3f M-SOLAR", star.initial_mass_solar),
+				UX.text,
+				"Mass when the star formed, before stellar winds or interactions changed it.",
 			)
 		}
 	} else {
@@ -335,31 +360,40 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 			"SEMI-MAJOR AXIS",
 			fmt.tprintf("%.3f AU", body.inputs.semi_major_axis_au),
 			UX.info,
+			"The orbit's average distance from its host. One AU is the Earth–Sun distance.",
 		)
 		draw_celestial_stat(
 			924,
 			180,
 			"ORBITAL PERIOD",
 			fmt.tprintf("%.1f DAYS", body.orbital_period_days),
+			UX.text,
+			"Time required to complete one orbit around the host.",
 		)
-		draw_celestial_stat(780, 252, "MASS", fmt.tprintf("%.3f EARTH", body.inputs.mass_earth))
+		draw_celestial_stat(780, 252, "MASS", fmt.tprintf("%.3f EARTH", body.inputs.mass_earth), UX.text, "Mass compared with Earth.")
 		draw_celestial_stat(
 			924,
 			252,
 			"MEAN RADIUS",
 			fmt.tprintf("%.3f EARTH", body.inputs.radius_earth),
+			UX.text,
+			"Average radius compared with Earth's radius.",
 		)
 		draw_celestial_stat(
 			780,
 			324,
 			"SURFACE GRAVITY",
 			fmt.tprintf("%.2f G", body.surface_gravity_earth),
+			UX.text,
+			"Gravity at the surface, measured in Earth gravities.",
 		)
 		draw_celestial_stat(
 			924,
 			324,
 			"ESCAPE VELOCITY",
 			fmt.tprintf("%.2f KM/S", body.escape_velocity_km_s),
+			UX.text,
+			"Minimum speed needed to escape the planet's gravity without further thrust.",
 		)
 		draw_celestial_stat(
 			780,
@@ -367,18 +401,23 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 			"SURFACE TEMP.",
 			fmt.tprintf("%.0f K", body.surface_temperature_k),
 			body.climate == .Temperate ? UX.good : UX.warn,
+			"Modeled average surface temperature. K means kelvin.",
 		)
 		draw_celestial_stat(
 			924,
 			396,
 			"STELLAR FLUX",
 			fmt.tprintf("%.2f EARTH", body.stellar_flux_earth),
+			UX.text,
+			"Starlight reaching the planet, compared with the sunlight Earth receives.",
 		)
 		draw_celestial_stat(
 			780,
 			468,
 			"ECCENTRICITY",
 			fmt.tprintf("%.3f", body.inputs.eccentricity),
+			UX.text,
+			"How stretched the orbit is: 0 is circular; larger values vary its distance from the host more.",
 		)
 		host_label :=
 			planet.host.body.kind == .Barycenter ? "BARYCENTER" : fmt.tprintf("STAR %c", u8('A' + planet.host.body.index))
@@ -393,6 +432,7 @@ draw_celestial_body_modal :: proc(s: ^Ux_State) {
 				planet.flux_envelope.maximum_earth,
 			),
 			UX.info,
+			"The body being orbited and the lowest-to-highest starlight received across this planet's orbit, in Earth units.",
 		)
 	}
 

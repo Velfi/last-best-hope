@@ -20,7 +20,14 @@ fleet_passage_commission_ready :: proc(c: ^game.Campaign) -> bool {
 }
 
 fleet_opening_council_pending :: proc(c: ^game.Campaign) -> bool {
-	return c.founding_decision_event != 0 && c.season == 0 && !c.passage.active
+	// A founding record alone is not enough to route the player into the
+	// Compact. Older or incomplete saves can have that record without a call
+	// that the Compact can act on, which otherwise leaves the player on an
+	// empty docket at startup.
+	return c.founding_decision_event != 0 &&
+		c.season == 0 &&
+		!c.passage.active &&
+		fleet_compact_notification_pending(c)
 }
 
 open_opening_council :: proc(s: ^Ux_State) {
@@ -35,7 +42,10 @@ open_opening_council :: proc(s: ^Ux_State) {
 		s.selected_need = i
 		break
 	}
-	s.screen = .Care
+	// Do not present the Compact as a destination unless it has an actionable
+	// call or counsel. The Fleet is the useful recovery point if surfacing an
+	// old campaign's opening call was not possible.
+	s.screen = fleet_compact_notification_pending(s.campaign) ? .Care : .Fleet
 }
 
 
@@ -61,6 +71,11 @@ fleet_only_prompts_for_an_opening_council_after_a_founding_record :: proc(t: ^te
 	defer game.campaign_destroy_heap(c)
 	testing.expect(t, !fleet_opening_council_pending(c))
 	c.founding_decision_event = 1
+	testing.expect(t, !fleet_opening_council_pending(c))
+	c.compact.calls[0] = {
+		status = .Open,
+	}
+	c.compact.call_count = 1
 	testing.expect(t, fleet_opening_council_pending(c))
 	c.season = 1
 	testing.expect(t, !fleet_opening_council_pending(c))

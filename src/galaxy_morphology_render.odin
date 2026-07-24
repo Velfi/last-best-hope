@@ -309,19 +309,65 @@ galaxy_fleet_neighborhood_index :: proc(s: ^Ux_State) -> int {
 	return s.campaign.galaxy.detailed_systems[system_index].neighborhood_index
 }
 
-draw_galaxy_fleet_marker :: proc(p: rl.Vector2, radius: f32) {
-	marker := radius + 8
-	// A measured crosshair reads separately from the survey and contact marks,
-	// while retaining the map's archival instrument language.
-	rl.DrawLineEx(V(p.x, p.y - marker), V(p.x + marker, p.y), 1, UX.info)
-	rl.DrawLineEx(V(p.x + marker, p.y), V(p.x, p.y + marker), 1, UX.info)
-	rl.DrawLineEx(V(p.x, p.y + marker), V(p.x - marker, p.y), 1, UX.info)
-	rl.DrawLineEx(V(p.x - marker, p.y), V(p.x, p.y - marker), 1, UX.info)
-	rl.DrawLineEx(V(p.x - marker - 4, p.y), V(p.x - marker + 2, p.y), 1.5, UX.info)
-	rl.DrawLineEx(V(p.x + marker - 2, p.y), V(p.x + marker + 4, p.y), 1.5, UX.info)
-	rl.DrawLineEx(V(p.x, p.y - marker - 4), V(p.x, p.y - marker + 2), 1.5, UX.info)
-	rl.DrawLineEx(V(p.x, p.y + marker - 2), V(p.x, p.y + marker + 4), 1.5, UX.info)
-	draw_text("FLEET", p.x + marker + 7, p.y - 7, TYPE_LABEL, UX.info)
+draw_galaxy_fleet_marker :: proc(
+	s: ^Ux_State,
+	p: rl.Vector2,
+	radius: f32,
+	neighborhood_index: int,
+) {
+	// The fleet occupies this system, but must not obscure its survey node. Keep
+	// the locator offset and tether it with a fine rule so both identities remain
+	// legible at a glance.
+	marker := radius + 7
+	anchor := V(p.x + radius + 18, p.y - radius - 18)
+	rl.DrawLineEx(
+		V(p.x + radius * .7, p.y - radius * .7),
+		V(anchor.x - marker * .66, anchor.y + marker * .66),
+		.8,
+		{UX.info.r, UX.info.g, UX.info.b, 170},
+	)
+	rl.DrawLineEx(V(anchor.x, anchor.y - marker), V(anchor.x + marker, anchor.y), 1, UX.info)
+	rl.DrawLineEx(V(anchor.x + marker, anchor.y), V(anchor.x, anchor.y + marker), 1, UX.info)
+	rl.DrawLineEx(V(anchor.x, anchor.y + marker), V(anchor.x - marker, anchor.y), 1, UX.info)
+	rl.DrawLineEx(V(anchor.x - marker, anchor.y), V(anchor.x, anchor.y - marker), 1, UX.info)
+	rl.DrawLineEx(
+		V(anchor.x - marker - 4, anchor.y),
+		V(anchor.x - marker + 2, anchor.y),
+		1.5,
+		UX.info,
+	)
+	rl.DrawLineEx(
+		V(anchor.x + marker - 2, anchor.y),
+		V(anchor.x + marker + 4, anchor.y),
+		1.5,
+		UX.info,
+	)
+	rl.DrawLineEx(
+		V(anchor.x, anchor.y - marker - 4),
+		V(anchor.x, anchor.y - marker + 2),
+		1.5,
+		UX.info,
+	)
+	rl.DrawLineEx(
+		V(anchor.x, anchor.y + marker - 2),
+		V(anchor.x, anchor.y + marker + 4),
+		1.5,
+		UX.info,
+	)
+	draw_text("FLEET", anchor.x + marker + 7, anchor.y - 7, TYPE_LABEL, UX.info)
+
+	hit := R(anchor.x - marker - 5, anchor.y - marker - 5, marker * 2 + 58, marker * 2 + 10)
+	interaction := rl.ButtonBehavior(ux_button_cursor, hit, true)
+	ux_button_cursor += 1
+	if interaction.activated do s.selected_neighborhood = neighborhood_index
+	if interaction.hovered || interaction.focused {
+		ux_tooltip = {
+			visible = true,
+			anchor  = hit,
+			title   = "FLEET LOCATION",
+			body    = "Select to inspect the stellar system occupied by the fleet.",
+		}
+	}
 }
 
 draw_galaxy_navigation_target_marker :: proc(p: rl.Vector2, radius, remaining_kpc: f32) {
@@ -334,7 +380,14 @@ draw_galaxy_navigation_target_marker :: proc(p: rl.Vector2, radius, remaining_kp
 	rl.DrawLineEx(V(p.x - marker, p.y), V(p.x, p.y - marker), 1.5, UX.committed)
 	rl.DrawLineEx(V(p.x - 3, p.y - 3), V(p.x + 3, p.y + 3), 1.5, UX.committed)
 	rl.DrawLineEx(V(p.x + 3, p.y - 3), V(p.x - 3, p.y + 3), 1.5, UX.committed)
-	draw_fmt(p.x + marker + 7, p.y - 7, TYPE_LABEL, UX.committed, "TARGET · %.1f KPC REMAINING", remaining_kpc)
+	draw_fmt(
+		p.x + marker + 7,
+		p.y - 7,
+		TYPE_LABEL,
+		UX.committed,
+		"TARGET · %.1f KPC REMAINING",
+		remaining_kpc,
+	)
 }
 
 update_galaxy_camera :: proc(s: ^Ux_State) {
@@ -430,7 +483,7 @@ draw_galaxy_neighborhoods :: proc(s: ^Ux_State) {
 			radius,
 			life_supporting ? UX.good : detailed ? UX.info : galaxy_neighborhood_color(n),
 		)
-		if i == fleet_neighborhood do draw_galaxy_fleet_marker(p, radius)
+		if i == fleet_neighborhood do draw_galaxy_fleet_marker(s, p, radius, i)
 		if i == target_neighborhood && i != fleet_neighborhood do draw_galaxy_navigation_target_marker(p, radius, f32(target_remaining_kpc))
 		if s.galaxy_zoom >= 9 &&
 		   p.x < GALAXY_VIEW.x + GALAXY_VIEW.width - 90 &&
