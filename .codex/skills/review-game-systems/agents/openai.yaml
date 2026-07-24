@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Game Systems"
+  short_description: "Evaluate loops, dynamics, and meaningful play"
+  default_prompt: "Use $review-game-systems to review this game’s system dynamics and identify whether they create meaningful play."

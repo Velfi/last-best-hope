@@ -1,0 +1,6 @@
+/build/
+/artifacts/
+/.tools/
+/dist/
+/.last-best-hope/
+.DS_Store

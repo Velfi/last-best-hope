@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-07-21",
+  "scenario": "star-hdr-main",
+  "command": "VIZZA_GPU_PROFILER=1 ./build/last-best-hope --benchmark-star 180 24301 main",
+  "resolution": "1280x720",
+  "hardware": {
+    "adapter": "Apple M4 Max",
+    "adapter_type": "Integrated GPU",
+    "graphics_api": "Vulkan via MoltenVK"
+  },
+  "fixture": {
+    "seed": 24301,
+    "class": "main",
+    "warmup_frames": 20,
+    "sample_frames": 180,
+    "timeline_hz": 60,
+    "magnetic_transport_hz": 4
+  },
+  "budget_ms": 16.67,
+  "runs": [
+    {
+      "cpu_frame_ms": {"median": 8.2880, "p95": 8.8405, "max": 9.1015},
+      "gpu_frame_ms": null
+    },
+    {
+      "cpu_frame_ms": {"median": 8.2139, "p95": 9.0467, "max": 9.6757},
+      "gpu_frame_ms": null
+    },
+    {
+      "cpu_frame_ms": {"median": 8.2439, "p95": 9.1704, "max": 25.1668},
+      "gpu_frame_ms": null
+    }
+  ],
+  "aggregate": {
+    "median_of_medians_ms": 8.2439,
+    "median_p95_ms": 9.0467,
+    "maximum_observed_ms": 25.1668,
+    "p95_budget_pass": true,
+    "maximum_budget_pass": false,
+    "minimum_headroom_at_p95_ms": 7.4996
+  },
+  "gpu_timestamp_status": {
+    "available": false,
+    "reason": "The selected MoltenVK device reports timestampComputeAndGraphics=false, so the engine correctly disables Vulkan timestamp queries. CPU wall-frame measurements include EndDrawing and frame synchronization."
+  }
+}

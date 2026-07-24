@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "suite": "render2d-boundary",
+  "fixture_seed": 24301,
+  "logical_viewport": {"width": 1280, "height": 720},
+  "captured_pixel_viewport": {"width": 2560, "height": 1440},
+  "ui_scale": 1.0,
+  "image_difference": {
+    "metric": "perceptual-pixel-ratio",
+    "maximum_changed_pixel_ratio": 0.005,
+    "maximum_channel_delta": 8,
+    "alpha_is_compared": true
+  },
+  "capture_environment": {
+    "color_space": "sRGB",
+    "reduced_motion": true,
+    "animation_time_seconds": 0.0,
+    "notes": "Compare like-for-like GPU/API/OS captures. Regenerate references only after an intentional visual review."
+  },
+  "fixtures": [
+    {
+      "id": "plain-primitives-text-textures-scissoring-graphs-hatching",
+      "command": "./build/last-best-hope --capture-ui-knollboard artifacts/baselines/render2d/ui-knollboard.png",
+      "expected": "artifacts/baselines/render2d/ui-knollboard.png",
+      "reference_status": "regeneration-required-after-characterization-strip",
+      "source_fixture": "src/ui_primitives.odin:draw_ui_knollboard",
+      "covers": ["plain-primitives", "text", "textures", "scissoring", "graphs", "hatching"]
+    },
+    {
+      "id": "planet",
+      "command": "./build/last-best-hope --capture-planet artifacts/baselines/render2d/planet.png 24301 ocean 1280 720",
+      "expected": "artifacts/baselines/render2d/planet.png",
+      "sha256": "b4595e8b952796921072e78b267c6ae83a7a8b6e4251edd7b941118a0a0e2a36",
+      "covers": ["planets", "textures", "hatching", "post-processing"]
+    },
+    {
+      "id": "star",
+      "command": "./build/last-best-hope --capture-star artifacts/baselines/render2d/star.png 24301 main 0 reduced",
+      "expected": "artifacts/baselines/render2d/star.png",
+      "sha256": "6503baf2dbe1966075f0c8557743c394e5c58029dac7e9d87d399f43e48f109d",
+      "covers": ["stars", "textures", "hatching", "post-processing"]
+    },
+    {
+      "id": "sdf-volumes",
+      "command": "./build/last-best-hope --capture-passage-deep artifacts/baselines/render2d/passage-shallow.png artifacts/baselines/render2d/passage-deep.png 24301",
+      "expected": "artifacts/baselines/render2d/passage-deep.png",
+      "sha256": "2b599953cbb6c8f6376e7a22ccc949ba6b26bfa60ff70c1ec782e1904a656494",
+      "companion_expected": "artifacts/baselines/render2d/passage-shallow.png",
+      "companion_sha256": "c411ad2b2ddcf4b6fc0faf605a878d7924cf0d2107a62f99a1ad2dbcd2de2b88",
+      "covers": ["SDF-volumes", "plain-primitives", "text", "scissoring", "hatching", "post-processing"]
+    }
+  ]
+}
