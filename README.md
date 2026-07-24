@@ -1,5 +1,7 @@
 # Last Best Hope
 
+![Last Best Hope main menu](main-menu.png)
+
 **Last Best Hope** is a deterministic fleet chronicle in which persistent
 starships become historical characters. The campaign alternates between the
 Diaspora Fleet simulation and **Passage**, where task groups navigate a
